@@ -17,6 +17,6 @@ export class User {
   @Column()
   password: string;
 
-  @Column({ type: 'enum', name: 'role', enum: RoleEnum })
-  role: RoleEnum;
+  @Column({ type: 'enum', name: 'role', enum: RoleEnum, default: 'user' })
+  role?: RoleEnum;
 }
