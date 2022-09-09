@@ -8,12 +8,17 @@ export class UsersController {
 
   @Post('/signup')
   create(@Body() user: User) {
-    console.log('user');
     return this.userService.create(user);
+  }
+
+  @Post('/login')
+  login(@Body() user: User) {
+    return this.userService.login(user);
   }
 
   @Delete('/:id')
   remove(@Param('id') id: number) {
-    this.userService.remove(id);
+    const result = this.userService.remove(id);
+    return result;
   }
 }
