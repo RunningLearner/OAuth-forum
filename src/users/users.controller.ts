@@ -7,18 +7,18 @@ export class UsersController {
   constructor(private userService: UsersService) {}
 
   @Post('/signup')
-  create(@Body() user: User) {
-    return this.userService.create(user);
+  async create(@Body() user: User): Promise<any> {
+    return await this.userService.create(user);
   }
 
   @Post('/login')
-  login(@Body() user: User) {
-    return this.userService.login(user);
+  async login(@Body() user: User): Promise<any> {
+    return await this.userService.login(user);
   }
 
   @Delete('/:id')
-  remove(@Param('id') id: number) {
-    const result = this.userService.remove(id);
+  async remove(@Param('id') id: number): Promise<any> {
+    const result = await this.userService.remove(id);
     return result;
   }
 }
