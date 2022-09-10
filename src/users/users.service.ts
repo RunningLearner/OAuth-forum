@@ -7,6 +7,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from './entity/users.entity';
 import * as bcrypt from 'bcrypt';
+import { UserCreateDto } from './dto/userCreateDto';
 
 @Injectable()
 export class UsersService {
@@ -27,17 +28,20 @@ export class UsersService {
     return password;
   }
 
-  async create(user: User): Promise<any> {
+  async create(user: UserCreateDto): Promise<any> {
     const userExist = await this.checkUserId(user.userId);
     if (userExist) {
       throw new BadRequestException('같은 아이디가 존재합니다!');
     }
     user.password = await this.transformPassword(user.password);
-    await this.usersRepository.save(user);
+    const newUser = new User();
+    newUser.userId = user.userId;
+    newUser.password = user.password;
+    await this.usersRepository.save(newUser);
     return { message: '회원가입이 완료되었습니다.' };
   }
 
-  async login(user: User): Promise<any> {
+  async login(user: UserCreateDto): Promise<any> {
     const userInfo = await this.usersRepository.findOne({
       where: { userId: user.userId },
     });
