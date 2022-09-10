@@ -6,6 +6,7 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from './entity/users.entity';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class UsersService {
@@ -18,7 +19,12 @@ export class UsersService {
     const user = await this.usersRepository.findOne({
       where: { userId: userId },
     });
-    return user !== undefined;
+    return user !== null;
+  }
+
+  private async transformPassword(password: string) {
+    password = await bcrypt.hash(password, 12);
+    return password;
   }
 
   async create(user: User): Promise<any> {
@@ -26,6 +32,7 @@ export class UsersService {
     if (userExist) {
       throw new BadRequestException('같은 아이디가 존재합니다!');
     }
+    user.password = await this.transformPassword(user.password);
     await this.usersRepository.save(user);
     return { message: '회원가입이 완료되었습니다.' };
   }
@@ -34,7 +41,11 @@ export class UsersService {
     const userInfo = await this.usersRepository.findOne({
       where: { userId: user.userId },
     });
-    if (userInfo.password == user.password) {
+    const passwordValidation = await bcrypt.compare(
+      user.password,
+      userInfo.password,
+    );
+    if (passwordValidation) {
       return { message: '로그인이 완료되었습니다.' };
     }
     throw new UnauthorizedException('회원정보가 틀립니다!');
