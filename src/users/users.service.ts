@@ -8,12 +8,16 @@ import { Repository } from 'typeorm';
 import { User } from './entity/users.entity';
 import * as bcrypt from 'bcrypt';
 import { UserCreateDto } from './dto/userCreateDto';
+import { Payload } from 'src/users/security/payload.interface';
+import { JwtService } from '@nestjs/jwt';
+import { AuthenticatedUserDTO } from './dto/authenticatedUserDto';
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectRepository(User)
     private usersRepository: Repository<User>,
+    private jwtService: JwtService,
   ) {}
 
   private async checkUserId(userId: string): Promise<any> {
@@ -45,12 +49,23 @@ export class UsersService {
     const userInfo = await this.usersRepository.findOne({
       where: { userId: user.userId },
     });
+    if (!userInfo) {
+      throw new UnauthorizedException('회원을 찾을 수 없습니다!');
+    }
     const passwordValidation = await bcrypt.compare(
       user.password,
       userInfo.password,
     );
     if (passwordValidation) {
-      return { message: '로그인이 완료되었습니다.' };
+      const payload: Payload = {
+        id: userInfo.id,
+        userId: userInfo.userId,
+        role: userInfo.role,
+      };
+      return {
+        message: '로그인이 완료되었습니다.',
+        accessToken: this.jwtService.sign(payload),
+      };
     }
     throw new UnauthorizedException('회원정보가 틀립니다!');
   }
@@ -62,5 +77,13 @@ export class UsersService {
     } catch (error) {
       throw error;
     }
+  }
+
+  async tokenValidateUser(payload: Payload): Promise<any> {
+    const user: AuthenticatedUserDTO = await this.usersRepository.findOne({
+      select: { userId: true, role: true },
+      where: { id: payload.id },
+    });
+    return user;
   }
 }
