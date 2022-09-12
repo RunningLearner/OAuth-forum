@@ -81,7 +81,7 @@ export class UsersService {
 
   async tokenValidateUser(payload: Payload): Promise<any> {
     const user: AuthenticatedUserDTO = await this.usersRepository.findOne({
-      select: { userId: true, role: true },
+      select: { id: true, userId: true, role: true },
       where: { id: payload.id },
     });
     return user;
