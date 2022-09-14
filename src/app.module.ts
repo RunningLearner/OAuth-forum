@@ -6,9 +6,15 @@ import { AppService } from './app.service';
 import { User } from './users/entity/users.entity';
 import { UsersModule } from './users/users.module';
 import { PostsModule } from './posts/posts.module';
+import { Post } from './posts/entity/posts.entity';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { join } from 'path';
 
 @Module({
   imports: [
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, 'upload'),
+    }),
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath: '.env',
@@ -22,7 +28,7 @@ import { PostsModule } from './posts/posts.module';
       database: process.env.DB_DATABASENAME,
       synchronize: true, // 처음 서버 실행 이후 false설정 필요
       logging: false,
-      entities: [User],
+      entities: [User, Post],
       charset: 'utf8mb4',
     }),
     UsersModule,

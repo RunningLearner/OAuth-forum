@@ -1,10 +1,5 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
-
-// const RoleEnum = {
-//   admin: 'admin',
-//   user: 'user',
-// } as const;
-// type RoleEnum = typeof RoleEnum[keyof typeof RoleEnum];
+import { User } from 'src/users/entity/users.entity';
+import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity()
 export class Post {
@@ -22,4 +17,7 @@ export class Post {
 
   @Column()
   price: number;
+
+  @ManyToOne((type) => User, (user) => user.posts)
+  user: User;
 }

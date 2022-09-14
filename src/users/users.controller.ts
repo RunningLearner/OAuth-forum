@@ -3,7 +3,6 @@ import {
   Controller,
   Delete,
   Get,
-  Param,
   Post,
   Req,
   Res,
@@ -13,7 +12,6 @@ import { Request, Response } from 'express';
 import { Roles } from './decorator/role.decorator';
 import { UserCreateDto } from './dto/userCreateDto';
 import { RoleType } from './role-type';
-import { Payload } from './security/payload.interface';
 import { RolesGuard } from './security/roles.guard';
 import { JwtAuthGuard } from './security/user.guard';
 import { UsersService } from './users.service';
